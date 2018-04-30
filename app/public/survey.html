@@ -5,7 +5,7 @@
     <title>Beer Bud</title>
     <meta charset="utf-8">
 
-    
+
     <!--Bootstrap-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4"
         crossorigin="anonymous">
@@ -179,7 +179,9 @@
             </div>
             <button type="submit" class="btn btn-primary submit">Find me a Beer Bud!</button>
         </form>
-        <a href = "/api/friends"><p>api/friends</p></a>
+        <a href="/api/friends">
+            <p>api/friends</p>
+        </a>
     </div>
     <!--MODAL-->
     <div class="modal" tabindex="-1" role="dialog" id="beerModal">
@@ -207,6 +209,7 @@
 <script type="text/javascript">
     $(".submit").click(function (event) {
         var surveyAns = [];
+        //this will hold the user's answers, in the below for loop
         for (var i = 0; i < 10; i++) {
             var answer = $('input[name=q' + i + ']:checked', '#survey').val();
             surveyAns.push(answer);
@@ -217,25 +220,23 @@
             image: $("#photoURL").val().trim(),
             answers: surveyAns
         }
+        $("#userName").val("");
+        $("#photoURL").val("");
+        $("input:radio").removeAttr("checked");
 
         //console.log(newBuddy);
         findBuddy(surveyAns);
 
         $.post("/api/friends", newBuddy, function (data) {
             console.log(data);
-            $("#userName").val("");
-            $("#photoURL").val("");
-            for (var i = 0; i < 10; i++) {
-                $('input[name=q' + i + ']:checked').each(function () {
-                    this.checked = false;
-                });
-            }
+            //these will clear all of the form while also posting the data to the friends api
         });
     });
-    $(".close").click(function(event){
+    $(".close").click(function (event) {
         event.preventDefault();
         $("#beerModal").hide();
-    })
+    });
+    //the above couple lines make it so the modal can be closed
 
     function findBuddy(surveyAns) {
         var currentURL = window.location.origin + "/api/friends";
@@ -243,20 +244,21 @@
         var besty;
         var bestyPic;
         var bestyScore = 100;
+        //all these are for finding the new friend.  100 is greater than the maximum difference in scores so it will automatically be replaced regardless of how unlikable a person is.
         $.ajax({ url: currentURL, method: "GET" })
             .then(function (friends) {
-                // friends = JSON.stringify(friendsData);
-                //console.log("friends: " + friends);
-                //console.log("friendsData: " + friends[0].name, friends[0].answers);
-                //console.log("Your survey: " + surveyAns);
 
-                for (var i = 0; i < friends.length; i++) {
+                for (var i = 0; i < friends.length - 1; i++) {
+                    //went with .length-1 because heroku returned the person taking the survey as their best bud.  That or heroku knows that Al doesn't actually have any friends.
                     score = 0;
+                    //resets the initial score to 0 for each friend
+                    //the below loop will go through each answer for friend[i] to compare to user's answers
                     for (var j = 0; j < 10; j++) {
                         var diff = Math.abs(parseInt(surveyAns[j]) - parseInt(friends[i].answers[j]));
                         score += diff;
                     }
-                    console.log(friends[i].name, score);
+                    //console.log(friends[i].name, score);
+                    //below if statement will compare friend[i]'s score to the best friend's score.  will replace besty's info if new best friend.
                     if (score < bestyScore) {
                         besty = friends[i].name;
                         bestyPic = friends[i].image;
