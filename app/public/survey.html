@@ -220,9 +220,6 @@
             image: $("#photoURL").val().trim(),
             answers: surveyAns
         }
-        $("#userName").val("");
-        $("#photoURL").val("");
-        $("input:radio").removeAttr("checked");
 
         //console.log(newBuddy);
         findBuddy(surveyAns);
@@ -235,6 +232,9 @@
     $(".close").click(function (event) {
         event.preventDefault();
         $("#beerModal").hide();
+        $("#userName").val("");
+        $("#photoURL").val("");
+        $("input:radio").prop("checked", false);
     });
     //the above couple lines make it so the modal can be closed
 
@@ -269,7 +269,7 @@
                 console.log("besty: " + besty, bestyPic, bestyScore);
                 var img = "<img style='max-height:300px' src='" + bestyPic + "'>";
                 var name = "<h2>" + besty + "</h2>";
-                $("#beerBud").append(img + name);
+                $("#beerBud").html(img + name);
                 $("#beerModal").show();
             });
     };
